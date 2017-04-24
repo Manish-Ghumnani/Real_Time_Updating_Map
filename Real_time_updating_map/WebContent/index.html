@@ -1,14 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<!-- Adding the leaflet JS -->
+	<!-- <script src="JS/leaflet.js"></script> -->
+	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+	<script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
+	
+	
 <title>Real Time Updating Map</title>
 
 <!-- Addning Leaflet Style Sheets -->
-<link rel="stylesheet" href="CSS/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+<!-- <link rel="stylesheet" href="CSS/leaflet.css" /> -->
 
 </head>
 
@@ -17,8 +23,8 @@
 	<div id="wrapper" style="background-color: #EBD6EB;">
 		<div id="page-wrapper">
 			Display Settings
-
-			<li>Draw Paths : &nbsp;&nbsp;</a> <input id="drawPath"
+			<ol>
+			<li>Draw Paths : &nbsp;&nbsp; <input id="drawPath"
 				type="checkbox" name="drawPath">
 				<button type="button" onclick="checkCheckBox();">DRAW</button>
 			</li>
@@ -26,15 +32,21 @@
 					&nbsp;&nbsp;</a>
 				<button type="button" onclick="clearMarkers();">CLEAR</button></li>
 
-			<li>Focuss on a Device : <input id="followID"
+			<li>Focus on a Team : <input id="followID"
 				class="form-control" placeholder="Enter ID"> <input
 				id="followId" type="checkbox" name="drawPath" disabled="disabled">
 
-				<button type="button" onclick="followID(); checkBoxFollow();">Follow</button></li>
+				<button type="button" onclick="followID(); checkBoxFollow();">Follow</button> 
+				<button type="button" onclick="followAll();">FollowALL</button>
+				<button type="button" onclick="startEvent();">Start Event</button>
+				</li>
+				
+				
 			<li>Reset Map : &nbsp;&nbsp;
 				<button type="button" onclick="resetMap();">Reset</button>
 
 			</li>
+			</ol>
 		</div>
 
 	</div>
@@ -43,7 +55,7 @@
 		<div id="map" style="width: 1100px; height: 600px"></div>
 	</div>
 
-	<h4>Connected Device IDs</h4>
+	<h4>Connected Teams</h4>
 	<textarea class="form-control" id="idListArea" readonly></textarea>
 	<h4>Output Console</h4>
 
@@ -54,17 +66,19 @@
 	<button type="button" onclick="messagesTextArea.value=null;">Clear
 		Console</button>
 
-	<!-- Adding the leaflet JS -->
-	<script src="JS/leaflet.js"></script>
+	
 
 	<script>
 		//Creating a Layers for the markers and Polylines and Creating the Main map
+		
+		
+		
 		var markerLayer = new L.layerGroup();
 		var polylineLayer = new L.layerGroup();
 
-		var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
+		var mbAttr = 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors '
 				+ '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '
-				+ 'Imagery © <a href="http://mapbox.com">Mapbox</a>', mbUrl = 'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png';
+				+ 'Imagery © <a href="http://mapbox.com">Mapbox</a>', mbUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
 
 		var grayscale = L.tileLayer(mbUrl, {
 			id : 'examples.map-20v6611k',
@@ -75,10 +89,20 @@
 		});
 
 		var map = L.map('map', {
-			center : [ 6.88869, 79.85878 ],
+			center : [ 1.3108360, 103.7606830 ],
 			zoom : 13,
 			layers : [ streets, markerLayer, polylineLayer ]
 		});
+		
+		
+		
+		
+		//L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+		//attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a //href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		//maxZoom: 18,
+		//id: 'your.mapbox.project.id',
+		//accessToken: 'your.mapbox.public.access.token'
+		//}).addTo(map);
 
 		var baseLayers = {
 			"Grayscale" : grayscale,
@@ -91,27 +115,60 @@
 		};
 
 		L.control.layers(baseLayers, overlays).addTo(map);
+		
+		// load GeoJSON from an external file
+		
+        var geoFeature = {
+            "type": "Feature",
+            "properties": {
+                "name": "VivoCity",
+                "amenity": "So called mall?",
+                "popupContent": "Way to Sentosa!"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [1.3108360, 103.7606830]
+            }
+        };
+		
+        // load GeoJSON from an external file
+        L.geoJson(geoFeature).addTo(map);
+		//$.getJSON("stations.geojson",function(data){
+		// add GeoJSON layer to the map once the file is loaded
+		//L.geoJson(data).addTo(map);
+		//});
+
+
+
+
+
+		
 	</script>
 
 	<script type="text/javascript">
 		// This script is to simmulate a dataset to demonstrate 
 		var j = 0;
-		var lat = 6.88869;
-		var lon = 79.85878;
+		var lat = 1.3108360;
+		var lon = 103.7606830;
+		
 		var speedflag = "false";
+		var vlat = 1.3108360;
+		var vlon = 103.7606830;
 
 		function myLoop() {
 			setTimeout(function() {
 
-				lat = lat + 0.0001;
-				lon = lon + 0.0001;
+				lat = lat + 0.00009;
+				lon = lon + 0.00009;
 
-				lat2 = lat + 0.0001;
-				lon2 = lon + 0.0002;
+				vlat = vlat + 0.00003;
+				vlon = vlon + 0.00005;
 
 				var id = Math.floor((Math.random() * 2) + 1);
-
+				
+				
 				mapUpdater("" + id, lat, lon);
+				//mapUpdater("" + id, vlat, vlon);
 
 				j++;
 				if (j < 1000) {
@@ -168,7 +225,7 @@
 			//If the list doesn't contain anything Adding The Markers and PolyLines
 			if (idList.length == 0) {
 
-				mark = L.marker([ lat, lon ]).bindPopup("Vehicle ID : " + id, {
+				mark = L.marker([ lat, lon ]).bindPopup("Team : " + id, {
 					autoPan : false
 				});
 				markerLayer.addLayer(mark);
@@ -193,7 +250,7 @@
 				else if ((i - 1) == 0) {
 
 					mark = L.marker([ lat, lon ]).bindPopup(
-							"Vehicle ID : " + id, {
+							"Team : " + id, {
 								autoPan : false
 							});
 					markerLayer.addLayer(mark);
@@ -226,7 +283,7 @@
 				idList[len][2].addLatLng([ lat, lon ]); // updating the poly-line
 			}
 
-			// Maintaining the focus on a selected device
+			// Maintaining the focus on a selected team
 			if (document.getElementById("followId").checked
 					&& document.getElementById("followID").value == id) {
 				map.panTo([ lat, lon ], {
@@ -268,7 +325,17 @@
 				}
 			}
 		}
-
+		
+		//Function to maintain focus on all teams
+		function followAll() {
+			for (var i = idList.length; i>0; i--) {
+				idList[i-1][1].openPopup();
+			}
+		}
+		
+		
+	
+	
 		//toggling the check box
 		function checkBoxFollow() {
 			var fid = document.getElementById("followID").value;

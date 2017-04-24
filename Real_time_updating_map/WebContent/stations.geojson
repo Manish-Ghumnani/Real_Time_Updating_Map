@@ -1,0 +1,60 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "West Coast",
+              },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.3108360,
+          103.7606830
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "NUS",
+        
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.2969350,
+          103.7764758
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "VivoCity",
+        
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.2643275,
+          103.8223953
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Orchard Road",
+        
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.4111200,
+          103.8443190
+        ]
+      }
+    },
+  ]
+}
